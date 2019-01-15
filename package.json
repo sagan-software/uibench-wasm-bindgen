@@ -1,0 +1,16 @@
+{
+  "name": "wasm-bindgen-benchmarks",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:sagan-software/wasm-bindgen-benchmarks.git",
+  "author": "Liam Curry <liam@sagan.software>",
+  "license": "MIT",
+  "devDependencies": {
+    "clean-webpack-plugin": "^1.0.0",
+    "concurrently": "^4.1.0",
+    "html-webpack-plugin": "^3.2.0",
+    "webpack": "^4.28.4",
+    "webpack-cli": "^3.2.1",
+    "webpack-dev-server": "^3.1.14"
+  }
+}
