@@ -8,7 +8,7 @@ build-wasm:
 		target/wasm32-unknown-unknown/release/uibench_gc_opt.wasm -O \
 		target/wasm32-unknown-unknown/release/uibench_gc.wasm
 	wasm-bindgen \
-		target/wasm32-unknown-unknown/release/uibench_gc_opt.wasm \
+		target/wasm32-unknown-unknown/release/uibench.wasm \
 		--out-dir target
 
 dist:
@@ -16,7 +16,7 @@ dist:
 	git worktree add ./dist gh-pages
 
 .PHONY: build
-build: dist
+build: dist build-wasm
 	`yarn bin`/webpack
 
 .PHONY: start
