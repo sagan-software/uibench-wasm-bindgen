@@ -1,49 +1,85 @@
-use serde_derive::Deserialize;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{console, Event, HtmlElement};
 
-#[derive(Deserialize)]
-struct TableItemState {
-    id: u32,
-    active: bool,
-    props: Vec<String>,
+#[wasm_bindgen]
+extern "C" {
+    type TableItemState;
+
+    #[wasm_bindgen(method, getter)]
+    fn id(this: &TableItemState) -> u32;
+
+    #[wasm_bindgen(method, getter)]
+    fn active(this: &TableItemState) -> bool;
+
+    #[wasm_bindgen(method, getter)]
+    fn props(this: &TableItemState) -> Box<[JsValue]>;
 }
 
-#[derive(Deserialize)]
-struct TableState {
-    items: Vec<TableItemState>,
+#[wasm_bindgen]
+extern "C" {
+    type TableState;
+
+    #[wasm_bindgen(method, getter)]
+    fn items(this: &TableState) -> Box<[JsValue]>;
 }
 
-#[derive(Deserialize)]
-struct AnimBoxState {
-    id: u32,
-    time: f32,
+#[wasm_bindgen]
+extern "C" {
+    type AnimBoxState;
+
+    #[wasm_bindgen(method, getter)]
+    fn id(this: &AnimBoxState) -> u32;
+
+    #[wasm_bindgen(method, getter)]
+    fn time(this: &AnimBoxState) -> f32;
 }
 
-#[derive(Deserialize)]
-struct AnimState {
-    items: Vec<AnimBoxState>,
+#[wasm_bindgen]
+extern "C" {
+    type AnimState;
+
+    #[wasm_bindgen(method, getter)]
+    fn items(this: &AnimState) -> Box<[JsValue]>;
 }
 
-#[derive(Deserialize)]
-struct TreeNodeState {
-    id: u32,
-    container: bool,
-    children: Option<Vec<TreeNodeState>>,
+#[wasm_bindgen]
+extern "C" {
+    type TreeNodeState;
+
+    #[wasm_bindgen(method, getter)]
+    fn id(this: &TreeNodeState) -> u32;
+
+    #[wasm_bindgen(method, getter)]
+    fn container(this: &TreeNodeState) -> bool;
+
+    #[wasm_bindgen(method, getter)]
+    fn children(this: &TreeNodeState) -> Option<Box<[JsValue]>>;
 }
 
-#[derive(Deserialize)]
-struct TreeState {
-    root: TreeNodeState,
+#[wasm_bindgen]
+extern "C" {
+    type TreeState;
+
+    #[wasm_bindgen(method, getter)]
+    fn root(this: &TreeState) -> JsValue;
 }
 
-#[derive(Deserialize)]
-struct AppState {
-    location: String,
-    table: TableState,
-    anim: AnimState,
-    tree: TreeState,
+#[wasm_bindgen]
+extern "C" {
+    type AppState;
+
+    #[wasm_bindgen(method, getter)]
+    fn location(this: &AppState) -> String;
+
+    #[wasm_bindgen(method, getter)]
+    fn table(this: &AppState) -> JsValue;
+
+    #[wasm_bindgen(method, getter)]
+    fn anim(this: &AppState) -> JsValue;
+
+    #[wasm_bindgen(method, getter)]
+    fn tree(this: &AppState) -> JsValue;
 }
 
 mod uibench {
@@ -69,12 +105,12 @@ fn render_table_cell(html: &mut String, props: &str) {
 
 fn render_table_row(html: &mut String, data: &TableItemState) {
     html.push_str("<tr class='TableRow");
-    if data.active {
+    if data.active() {
         html.push_str(" active");
     }
     html.push_str("' data-id='");
 
-    let id = data.id.to_string();
+    let id = data.id().to_string();
     html.push_str(&id);
     html.push_str("'>");
 
@@ -82,51 +118,53 @@ fn render_table_row(html: &mut String, data: &TableItemState) {
     pound_id.push_str(&id);
     render_table_cell(html, &pound_id);
 
-    for prop in data.props.iter() {
-        render_table_cell(html, prop);
+    for prop in data.props().iter() {
+        let value: String = prop.unchecked_ref::<js_sys::JsString>().into();
+        render_table_cell(html, value.as_str());
     }
     html.push_str("</tr>");
 }
 
 fn render_table(html: &mut String, data: &TableState) {
     html.push_str("<table class='Table'><tbody>");
-    for item in data.items.iter() {
-        render_table_row(html, item);
+    for item in data.items().iter() {
+        render_table_row(html, item.unchecked_ref::<TableItemState>());
     }
     html.push_str("</tbody></table>");
 }
 
 fn render_anim_box(html: &mut String, props: &AnimBoxState) {
     html.push_str("<div class='AnimBox' style='border-radius:");
-    let border_radius = props.time % 10.0;
+    let border_radius = props.time() % 10.0;
     html.push_str(&border_radius.to_string());
     html.push_str("px;background:rgba(0,0,0,");
     let alpha = border_radius / 10.0 + 0.5;
     html.push_str(&alpha.to_string());
     html.push_str(")' data-id='");
-    html.push_str(&props.id.to_string());
+    html.push_str(&props.id().to_string());
     html.push_str("'></div>");
 }
 
 fn render_anim(html: &mut String, props: &AnimState) {
     html.push_str("<div class='Anim'>");
-    for item in props.items.iter() {
-        render_anim_box(html, item);
+    for item in props.items().iter() {
+        render_anim_box(html, item.unchecked_ref::<AnimBoxState>());
     }
     html.push_str("</div>")
 }
 
 fn render_tree_leaf(html: &mut String, props: &TreeNodeState) {
     html.push_str("<li class='TreeLeaf'>");
-    html.push_str(&props.id.to_string());
+    html.push_str(&props.id().to_string());
     html.push_str("</li>");
 }
 
 fn render_tree_node(html: &mut String, props: &TreeNodeState) {
     html.push_str("<ul class='TreeNode'>");
-    if let Some(children) = &props.children {
-        for child in children {
-            if child.container {
+    if let Some(children) = &props.children() {
+        for value in children.iter() {
+            let child = value.unchecked_ref::<TreeNodeState>();
+            if child.container() {
                 render_tree_node(html, child);
             } else {
                 render_tree_leaf(html, child);
@@ -138,16 +176,16 @@ fn render_tree_node(html: &mut String, props: &TreeNodeState) {
 
 fn render_tree(html: &mut String, props: &TreeState) {
     html.push_str("<div class='Tree'>");
-    render_tree_node(html, &props.root);
+    render_tree_node(html, &props.root().unchecked_ref::<TreeNodeState>());
     html.push_str("</div>");
 }
 
 fn render_main(html: &mut String, data: &AppState) {
     html.push_str("<div class='Main'>");
-    match data.location.as_str() {
-        "table" => render_table(html, &data.table),
-        "anim" => render_anim(html, &data.anim),
-        "tree" => render_tree(html, &data.tree),
+    match data.location().as_str() {
+        "table" => render_table(html, &data.table().unchecked_ref::<TableState>()),
+        "anim" => render_anim(html, &data.anim().unchecked_ref::<AnimState>()),
+        "tree" => render_tree(html, &data.tree().unchecked_ref::<TreeState>()),
         _ => (),
     }
     html.push_str("</div>");
@@ -174,11 +212,11 @@ pub fn run() {
     let mut inner_html = String::with_capacity(75_000);
     let update = Closure::wrap(Box::new(move |value: JsValue| {
         inner_html.clear();
-        let state: AppState = value.into_serde().unwrap();
+        let state = value.unchecked_ref::<AppState>();
         render_main(&mut inner_html, &state);
         container.set_inner_html(&inner_html);
 
-        if state.location == "table" {
+        if state.location() == "table" {
             let onclick = Closure::wrap(Box::new(handle_click) as Box<dyn FnMut(_)>);
 
             let cells = document.query_selector_all(".TableCell").unwrap();

@@ -1,1 +1,1 @@
-import("./target/uibench").catch(console.error);
+import("./target/uibench_gc_opt").catch(console.error);
