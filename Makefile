@@ -1,12 +1,6 @@
 .PHONY: build-wasm
 build-wasm:
 	cargo +stable build -vv --release --target=wasm32-unknown-unknown
-	wasm-gc \
-		target/wasm32-unknown-unknown/release/uibench.wasm \
-		target/wasm32-unknown-unknown/release/uibench_gc.wasm
-	wasm-opt --output \
-		target/wasm32-unknown-unknown/release/uibench_gc_opt.wasm -O4 \
-		target/wasm32-unknown-unknown/release/uibench_gc.wasm
 	wasm-bindgen \
 		target/wasm32-unknown-unknown/release/uibench.wasm \
 		--out-dir target
