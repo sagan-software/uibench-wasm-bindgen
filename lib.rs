@@ -208,27 +208,17 @@ pub fn run() {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
     let container = document.get_element_by_id("App").unwrap();
+    let onclick = Closure::wrap(Box::new(handle_click) as Box<dyn FnMut(_)>);
+    container
+        .unchecked_ref::<HtmlElement>()
+        .set_onclick(Some(onclick.as_ref().unchecked_ref()));
 
     let mut inner_html = String::with_capacity(75_000);
     let update = Closure::wrap(Box::new(move |value: JsValue| {
-        inner_html.clear();
         let state = value.unchecked_ref::<AppState>();
         render_main(&mut inner_html, &state);
         container.set_inner_html(&inner_html);
-
-        if state.location() == "table" {
-            let onclick = Closure::wrap(Box::new(handle_click) as Box<dyn FnMut(_)>);
-
-            let cells = document.query_selector_all(".TableCell").unwrap();
-            for i in 0..cells.length() {
-                cells
-                    .get(i)
-                    .unwrap()
-                    .unchecked_ref::<HtmlElement>()
-                    .set_onclick(Some(onclick.as_ref().unchecked_ref()));
-            }
-            onclick.forget();
-        }
+        inner_html.clear();
     }) as Box<dyn FnMut(_)>);
 
     let document = window.document().unwrap();
