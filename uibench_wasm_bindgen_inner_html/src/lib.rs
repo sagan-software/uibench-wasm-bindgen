@@ -1,99 +1,7 @@
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{console, Event, HtmlElement};
-
-#[wasm_bindgen]
-extern "C" {
-    type TableItemState;
-
-    #[wasm_bindgen(method, getter)]
-    fn id(this: &TableItemState) -> u32;
-
-    #[wasm_bindgen(method, getter)]
-    fn active(this: &TableItemState) -> bool;
-
-    #[wasm_bindgen(method, getter)]
-    fn props(this: &TableItemState) -> Box<[JsValue]>;
-}
-
-#[wasm_bindgen]
-extern "C" {
-    type TableState;
-
-    #[wasm_bindgen(method, getter)]
-    fn items(this: &TableState) -> Box<[JsValue]>;
-}
-
-#[wasm_bindgen]
-extern "C" {
-    type AnimBoxState;
-
-    #[wasm_bindgen(method, getter)]
-    fn id(this: &AnimBoxState) -> u32;
-
-    #[wasm_bindgen(method, getter)]
-    fn time(this: &AnimBoxState) -> f32;
-}
-
-#[wasm_bindgen]
-extern "C" {
-    type AnimState;
-
-    #[wasm_bindgen(method, getter)]
-    fn items(this: &AnimState) -> Box<[JsValue]>;
-}
-
-#[wasm_bindgen]
-extern "C" {
-    type TreeNodeState;
-
-    #[wasm_bindgen(method, getter)]
-    fn id(this: &TreeNodeState) -> u32;
-
-    #[wasm_bindgen(method, getter)]
-    fn container(this: &TreeNodeState) -> bool;
-
-    #[wasm_bindgen(method, getter)]
-    fn children(this: &TreeNodeState) -> Option<Box<[JsValue]>>;
-}
-
-#[wasm_bindgen]
-extern "C" {
-    type TreeState;
-
-    #[wasm_bindgen(method, getter)]
-    fn root(this: &TreeState) -> JsValue;
-}
-
-#[wasm_bindgen]
-extern "C" {
-    type AppState;
-
-    #[wasm_bindgen(method, getter)]
-    fn location(this: &AppState) -> String;
-
-    #[wasm_bindgen(method, getter)]
-    fn table(this: &AppState) -> JsValue;
-
-    #[wasm_bindgen(method, getter)]
-    fn anim(this: &AppState) -> JsValue;
-
-    #[wasm_bindgen(method, getter)]
-    fn tree(this: &AppState) -> JsValue;
-}
-
-mod uibench {
-    use wasm_bindgen::prelude::*;
-
-    #[wasm_bindgen]
-    extern "C" {
-        #[wasm_bindgen(js_namespace = uibench)]
-        pub fn init(name: &str, version: &str);
-
-        #[wasm_bindgen(js_namespace = uibench)]
-        pub fn run(update: &JsValue, finish: &JsValue);
-    }
-}
+use uibench_sys::*;
 
 fn render_table_cell(html: &mut String, props: &str) {
     html.push_str("<td class='TableCell' data-text='");
@@ -232,8 +140,8 @@ pub fn run() {
         body.set_inner_html(&inner_html);
     }) as Box<dyn FnMut(_)>);
 
-    uibench::init("wasm-bindgen", "0.2.31");
-    uibench::run(
+    uibench_sys::init("wasm-bindgen (innerHTML)", "0.2.31");
+    uibench_sys::run(
         update.as_ref().unchecked_ref(),
         finish.as_ref().unchecked_ref(),
     );

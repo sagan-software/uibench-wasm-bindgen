@@ -1,34 +1,12 @@
-[package]
-name = "uibench"
-version = "0.1.0"
-edition = "2018"
-authors = ["Liam Curry <liam@sagan.software>"]
-license = "MIT/Apache-2.0"
-
-[lib]
-crate-type = ["cdylib"]
-path = "lib.rs"
-
-[dependencies]
-js-sys = "0.3"
-wasm-bindgen = "0.2"
-
-[dependencies.web-sys]
-version = "0.3"
-features = [
-  'console',
-  'Document',
-  'Element',
-  'Event',
-  'EventTarget',
-  'HtmlElement',
-  'Node',
-  'NodeList',
-  'Window',
-]
-
 [profile.release]
 lto = true
 opt-level = 3
 debug = true
 panic = "abort"
+
+[workspace]
+members = [
+  "uibench_sys",
+  "uibench_wasm_bindgen_clone",
+  "uibench_wasm_bindgen_inner_html",
+]

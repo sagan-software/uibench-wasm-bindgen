@@ -1,23 +1,68 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CleanWebpackPlugin = require("clean-webpack-plugin");
+const WasmPackPlugin = require("@wasm-tool/wasm-pack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
-const inDir = path.resolve(__dirname);
-const outDir = path.resolve(__dirname, "dist");
-
-module.exports = {
-  entry: path.resolve(inDir, "index.js"),
-  output: {
-    path: outDir,
-    filename: "index.js"
-  },
-  devServer: {
-    contentBase: path.resolve(__dirname, "dist")
-  },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: path.resolve(inDir, "index.html"),
-      minify: true
-    })
-  ],
-  mode: "production"
-};
+module.exports = [
+    "uibench_wasm_bindgen_clone",
+    "uibench_wasm_bindgen_inner_html",
+].map(pkg => {
+    const crateDirectory = path.resolve(__dirname, pkg);
+    const outPath = path.resolve(__dirname, "docs", pkg);
+    return {
+        mode: "production",
+        entry: path.resolve(crateDirectory, "static", "index.js"),
+        output: {
+            path: outPath,
+            filename: "index.js",
+            publicPath: `/${pkg}/`,
+        },
+        devServer: {
+            contentBase: path.resolve(__dirname, "docs"),
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.css$/,
+                    use: [
+                        "style-loader",
+                        MiniCssExtractPlugin.loader,
+                        "css-loader",
+                    ],
+                },
+            ],
+        },
+        plugins: [
+            new CleanWebpackPlugin({
+                dry: true,
+                cleanOnceBeforeBuildPatterns: [
+                    path.resolve(crateDirectory, "pkg", "*"),
+                ],
+            }),
+            new MiniCssExtractPlugin({
+                filename: "index.css",
+            }),
+            new WasmPackPlugin({
+                crateDirectory,
+                watchDirectories: [
+                    path.resolve(__dirname, "uibench_sys", "src"),
+                    path.resolve(
+                        __dirname,
+                        "uibench_wasm_bindgen_inner_html",
+                        "src",
+                    ),
+                    path.resolve(
+                        __dirname,
+                        "uibench_wasm_bindgen_clone",
+                        "src",
+                    ),
+                ],
+            }),
+            new HtmlWebpackPlugin({
+                template: path.resolve(crateDirectory, "static", "index.html"),
+                minify: true,
+            }),
+        ],
+    };
+});
