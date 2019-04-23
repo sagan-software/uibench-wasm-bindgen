@@ -5,18 +5,17 @@ const WasmPackPlugin = require("@wasm-tool/wasm-pack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = [
-    "uibench_wasm_bindgen_clone",
-    "uibench_wasm_bindgen_inner_html",
-].map(pkg => {
+    ["uibench_wasm_bindgen_clone", "clone"],
+    ["uibench_wasm_bindgen_inner_html", "inner-html"],
+].map(([pkg, out]) => {
     const crateDirectory = path.resolve(__dirname, pkg);
-    const outPath = path.resolve(__dirname, "docs", pkg);
+    const outPath = path.resolve(__dirname, "docs", out);
     return {
         mode: "production",
         entry: path.resolve(crateDirectory, "static", "index.js"),
         output: {
             path: outPath,
             filename: "index.js",
-            publicPath: `/${pkg}/`,
         },
         devServer: {
             contentBase: path.resolve(__dirname, "docs"),
