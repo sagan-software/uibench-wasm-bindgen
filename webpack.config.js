@@ -6,7 +6,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = [
     ["uibench_wasm_bindgen_clone", "clone"],
-    ["uibench_wasm_bindgen_inner_html", "inner-html"],
+    ["uibench_wasm_bindgen_inner_html", "inner"],
 ].map(([pkg, out]) => {
     const crateDirectory = path.resolve(__dirname, pkg);
     const outPath = path.resolve(__dirname, "docs", out);
